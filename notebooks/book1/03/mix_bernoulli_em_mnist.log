@@ -10,37 +10,16 @@ from jax.random import PRNGKey, randint
 
 try:
     import tensorflow as tf
-except:
-    %pip install tensorflow
+except ModuleNotFoundError:
+    %pip install -qq tensorflow
     import tensorflow as tf
-from probml_utils.mix_bernoulli_lib import BMM
+try:
+    from probml_utils.mix_bernoulli_lib import BMM
+except ModuleNotFoundError:
+    %pip install -qq git+https://github.com/probml/probml-utils.git
+    from probml_utils.mix_bernoulli_lib import BMM
 
-
-def mnist_data(n_obs, rng_key=None):
-    """
-    Downloads data from tensorflow datasets
-    Parameters
-    ----------
-    n_obs : int
-        Number of digits randomly chosen from mnist
-    rng_key : array
-        Random key of shape (2,) and dtype uint32
-    Returns
-    -------
-    * array((n_obs, 784))
-        Dataset
-    """
-    rng_key = PRNGKey(0) if rng_key is None else rng_key
-
-    (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
-    x = (x_train > 0).astype("int")  # Converting to binary
-    dataset_size = x.shape[0]
-
-    perm = randint(rng_key, minval=0, maxval=dataset_size, shape=((n_obs,)))
-    x_train = x[perm]
-    x_train = x_train.reshape((n_obs, 784))
-
-    return x_train
+from probml_utils.mix_bernoulli_em_mnist import mnist_data
 
 
 def main():
@@ -59,79 +38,88 @@ if __name__ == "__main__":
 ------------------
 
 ---------------------------------------------------------------------------
-AttributeError                            Traceback (most recent call last)
-Input In [1], in <cell line: 14>()
-     12     get_ipython().run_line_magic('pip', 'install tensorflow')
-     13     import tensorflow as tf
----> 14 from probml_utils.mix_bernoulli_lib import BMM
-     17 def mnist_data(n_obs, rng_key=None):
-     18     """
-     19     Downloads data from tensorflow datasets
-     20     Parameters
-   (...)
-     29         Dataset
-     30     """
+TypeError                                 Traceback (most recent call last)
+/tmp/ipykernel_5221/205051138.py in <module>
+      8 
+      9 try:
+---> 10     import tensorflow as tf
+     11 except ModuleNotFoundError:
+     12     get_ipython().run_line_magic('pip', 'install -qq tensorflow')
 
-File /usr/local/lib/python3.9/dist-packages/probml_utils/mix_bernoulli_lib.py:12, in <module>
-      9 from jax.nn import softmax
-     10 from jax.experimental import optimizers
----> 12 import distrax
-     13 from distrax._src.utils import jittable
-     15 from .mixture_lib import MixtureSameFamily
+~/miniconda3/envs/py37/lib/python3.7/site-packages/tensorflow/__init__.py in <module>
+     35 import typing as _typing
+     36 
+---> 37 from tensorflow.python.tools import module_util as _module_util
+     38 from tensorflow.python.util.lazy_loader import LazyLoader as _LazyLoader
+     39 
 
-File /usr/local/lib/python3.9/dist-packages/distrax/__init__.py:20, in <module>
-     18 from distrax._src.bijectors.bijector import Bijector
-     19 from distrax._src.bijectors.bijector import BijectorLike
----> 20 from distrax._src.bijectors.block import Block
-     21 from distrax._src.bijectors.chain import Chain
-     22 from distrax._src.bijectors.gumbel_cdf import GumbelCDF
+~/miniconda3/envs/py37/lib/python3.7/site-packages/tensorflow/python/__init__.py in <module>
+     35 
+     36 from tensorflow.python import pywrap_tensorflow as _pywrap_tensorflow
+---> 37 from tensorflow.python.eager import context
+     38 
+     39 # pylint: enable=wildcard-import
 
-File /usr/local/lib/python3.9/dist-packages/distrax/_src/bijectors/block.py:20, in <module>
-     17 from typing import Tuple
-     19 from distrax._src.bijectors import bijector as base
----> 20 from distrax._src.utils import conversion
-     21 from distrax._src.utils import math
-     23 Array = base.Array
+~/miniconda3/envs/py37/lib/python3.7/site-packages/tensorflow/python/eager/context.py in <module>
+     27 import six
+     28 
+---> 29 from tensorflow.core.framework import function_pb2
+     30 from tensorflow.core.protobuf import config_pb2
+     31 from tensorflow.core.protobuf import coordination_config_pb2
 
-File /usr/local/lib/python3.9/dist-packages/distrax/_src/utils/conversion.py:19, in <module>
-     15 """Utility functions for conversion between different types."""
-     17 from typing import Optional, Union
----> 19 import chex
-     20 from distrax._src.bijectors import bijector
-     21 from distrax._src.bijectors import bijector_from_tfp
+~/miniconda3/envs/py37/lib/python3.7/site-packages/tensorflow/core/framework/function_pb2.py in <module>
+     14 
+     15 
+---> 16 from tensorflow.core.framework import attr_value_pb2 as tensorflow_dot_core_dot_framework_dot_attr__value__pb2
+     17 from tensorflow.core.framework import node_def_pb2 as tensorflow_dot_core_dot_framework_dot_node__def__pb2
+     18 from tensorflow.core.framework import op_def_pb2 as tensorflow_dot_core_dot_framework_dot_op__def__pb2
 
-File /usr/local/lib/python3.9/dist-packages/chex/__init__.py:17, in <module>
-      1 # Copyright 2020 DeepMind Technologies Limited. All Rights Reserved.
-      2 #
-      3 # Licensed under the Apache License, Version 2.0 (the "License");
-   (...)
-     13 # limitations under the License.
-     14 # ==============================================================================
-     15 """Chex: Testing made fun, in JAX!"""
----> 17 from chex._src.asserts import assert_axis_dimension
-     18 from chex._src.asserts import assert_axis_dimension_comparator
-     19 from chex._src.asserts import assert_axis_dimension_gt
+~/miniconda3/envs/py37/lib/python3.7/site-packages/tensorflow/core/framework/attr_value_pb2.py in <module>
+     14 
+     15 
+---> 16 from tensorflow.core.framework import tensor_pb2 as tensorflow_dot_core_dot_framework_dot_tensor__pb2
+     17 from tensorflow.core.framework import tensor_shape_pb2 as tensorflow_dot_core_dot_framework_dot_tensor__shape__pb2
+     18 from tensorflow.core.framework import types_pb2 as tensorflow_dot_core_dot_framework_dot_types__pb2
 
-File /usr/local/lib/python3.9/dist-packages/chex/_src/asserts.py:26, in <module>
-     23 import unittest
-     24 from unittest import mock
----> 26 from chex._src import asserts_internal as _ai
-     27 from chex._src import pytypes
-     28 import jax
+~/miniconda3/envs/py37/lib/python3.7/site-packages/tensorflow/core/framework/tensor_pb2.py in <module>
+     14 
+     15 
+---> 16 from tensorflow.core.framework import resource_handle_pb2 as tensorflow_dot_core_dot_framework_dot_resource__handle__pb2
+     17 from tensorflow.core.framework import tensor_shape_pb2 as tensorflow_dot_core_dot_framework_dot_tensor__shape__pb2
+     18 from tensorflow.core.framework import types_pb2 as tensorflow_dot_core_dot_framework_dot_types__pb2
 
-File /usr/local/lib/python3.9/dist-packages/chex/_src/asserts_internal.py:32, in <module>
-     29 from typing import Any, Sequence, Union, Callable, Optional, Set, Tuple, Type
-     31 from absl import logging
----> 32 from chex._src import pytypes
-     33 import jax
-     34 import jax.numpy as jnp
+~/miniconda3/envs/py37/lib/python3.7/site-packages/tensorflow/core/framework/resource_handle_pb2.py in <module>
+     14 
+     15 
+---> 16 from tensorflow.core.framework import tensor_shape_pb2 as tensorflow_dot_core_dot_framework_dot_tensor__shape__pb2
+     17 from tensorflow.core.framework import types_pb2 as tensorflow_dot_core_dot_framework_dot_types__pb2
+     18 
 
-File /usr/local/lib/python3.9/dist-packages/chex/_src/pytypes.py:40, in <module>
-     37 PyTreeDef = type(jax.tree_structure(None))
-     38 Shape = Tuple[int, ...]
----> 40 CpuDevice = jax.lib.xla_extension.CpuDevice
-     41 GpuDevice = jax.lib.xla_extension.GpuDevice
-     42 TpuDevice = jax.lib.xla_extension.TpuDevice
+~/miniconda3/envs/py37/lib/python3.7/site-packages/tensorflow/core/framework/tensor_shape_pb2.py in <module>
+     40       message_type=None, enum_type=None, containing_type=None,
+     41       is_extension=False, extension_scope=None,
+---> 42       serialized_options=None, file=DESCRIPTOR),
+     43     _descriptor.FieldDescriptor(
+     44       name='name', full_name='tensorflow.TensorShapeProto.Dim.name', index=1,
 
-AttributeError: module 'jaxlib.xla_extension' has no attribute 'CpuDevice'
-AttributeError: module 'jaxlib.xla_extension' has no attribute 'CpuDevice'
+~/miniconda3/envs/py37/lib/python3.7/site-packages/google/protobuf/descriptor.py in __new__(cls, name, full_name, index, number, type, cpp_type, label, default_value, message_type, enum_type, containing_type, is_extension, extension_scope, options, serialized_options, has_default_value, containing_oneof, json_name, file, create_key)
+    558                 has_default_value=True, containing_oneof=None, json_name=None,
+    559                 file=None, create_key=None):  # pylint: disable=redefined-builtin
+--> 560       _message.Message._CheckCalledFromGeneratedFile()
+    561       if is_extension:
+    562         return _message.default_pool.FindExtensionByName(full_name)
+
+TypeError: Descriptors cannot not be created directly.
+If this call came from a _pb2.py file, your generated code is out of date and must be regenerated with protoc >= 3.19.0.
+If you cannot immediately regenerate your protos, some other possible workarounds are:
+ 1. Downgrade the protobuf package to 3.20.x or lower.
+ 2. Set PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python (but this will use pure-Python parsing and will be much slower).
+
+More information: https://developers.google.com/protocol-buffers/docs/news/2022-05-06#python-updates
+TypeError: Descriptors cannot not be created directly.
+If this call came from a _pb2.py file, your generated code is out of date and must be regenerated with protoc >= 3.19.0.
+If you cannot immediately regenerate your protos, some other possible workarounds are:
+ 1. Downgrade the protobuf package to 3.20.x or lower.
+ 2. Set PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python (but this will use pure-Python parsing and will be much slower).
+
+More information: https://developers.google.com/protocol-buffers/docs/news/2022-05-06#python-updates
